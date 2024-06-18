@@ -4,7 +4,7 @@
 ### Bulk User Update  
 Log into multiple mikrotik routers and create a new random user with a random password and remove all existing users.  
 
-`npx ssh-commander@latest mikrotikbulkuserupdate`  
+`npx @bettercorp/ssh-commander@latest mikrotikbulkuserupdate`  
 
 
 

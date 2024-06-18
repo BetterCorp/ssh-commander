@@ -1,13 +1,13 @@
 {
   "name": "@bettercorp/ssh-commander",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BetterCorp/ssh-commander.git"
   },
   "bin": {
-    "ssh-commander": "src/index.js"
+    "ssh-commander": "node src/index.js"
   },
   "scripts": {},
   "keywords": [

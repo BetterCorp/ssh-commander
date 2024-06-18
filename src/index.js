@@ -3,7 +3,8 @@ const path = require('path');
 const {NodeSSH} = require('node-ssh');
 const ping = require('ping');
 const commanders = {
-  mikrotikBulkUserUpdate: require('./mikrotik/bulkUserUpdate')
+  mikrotikBulkUserUpdate: require('./mikrotik/bulkUserUpdate'),
+  mikrotikBulkExport: require('./mikrotik/bulkExport'),
 };
 
 (async () => {

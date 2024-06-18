@@ -1,0 +1,27 @@
+:global rb "{";
+:global rb ($rb . "\"routerboard\": \"".([/system routerboard get value-name=routerboard])."\",");
+:global rb ($rb . "\"boardName\": \"".([/system routerboard get value-name=board-name])."\",");
+:global rb ($rb . "\"model\": \"".([/system routerboard get value-name=model])."\",");
+:global rb ($rb . "\"revision\": \"".([/system routerboard get value-name=revision])."\",");
+:global rb ($rb . "\"serialNumber\": \"".([/system routerboard get value-name=serial-number])."\",");
+:global rb ($rb . "\"firmwareType\": \"".([/system routerboard get value-name=firmware-type])."\",");
+:global rb ($rb . "\"factoryFirmware\": \"".([/system routerboard get value-name=factory-firmware])."\",");
+:global rb ($rb . "\"currentFirmware\": \"".([/system routerboard get value-name=current-firmware])."\",");
+:global rb ($rb . "\"upgradeFirmware\": \"".([/system routerboard get value-name=upgrade-firmware])."\"");
+:global rb ($rb . "}");
+:global sys "";
+:foreach package in=[/system package find] do={
+    :global pkg "{";
+    :global pkg ($pkg . "\"name\": \"".([/system package get $package name])."\",");
+    :global pkg ($pkg . "\"version\": \"".([/system package get $package version])."\",");
+    :global pkg ($pkg . "\"disabled\": \"".([/system package get $package disabled])."\",");
+    :global pkg ($pkg . "\"scheduled\": \"".([/system package get $package scheduled])."\"");
+    :global pkg ($pkg . "}");
+    :global sys ($sys . "," . $pkg);
+};
+:global sys ("[" . [:pick $sys 1 [:len $sys]] . "]");
+:global info ("{");
+:global info ($info . "\"rb\": " . $rb . ",");
+:global info ($info . "\"sys\": " . $sys);
+:global info ($info . "}");
+:put $info;

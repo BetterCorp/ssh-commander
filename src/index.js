@@ -20,7 +20,8 @@ const commanders = {
   let commander = undefined;
   if (process.argv.length >= 3) {
     const cmd = process.argv[2].trim().toLowerCase();
-    commander = commanders[Object.keys(commanders).find((key) => key.toLowerCase() === cmd)].commander;
+    commander = commanders[Object.keys(commanders).find((key) => key.toLowerCase() === cmd)];
+    commander = commander?.commander;
   }
   if (commander === undefined) {
     console.error('What command do you want to run?');
@@ -38,7 +39,10 @@ const commanders = {
   let logs = [];
 
   for (const device of devices) {
-    const [name, ip, port, user, password, ignoreping] = device.split(',');
+    const [name, ip, port, user, password, ignoreping] = device.split(',').map(x => {
+      if (x.indexOf('"') === 0) return x.substring(1, x.length - 1);
+      return x;
+    });
     console.log(`Connecting to ${name}`);
     logs.push(`Connecting to ${name}`);
     try {
@@ -76,8 +80,13 @@ const commanders = {
           username: newConfig.user ?? user,
           password: newConfig.password ?? password,
         })
-        logs.push(` - RE-Connected (IP: ${newConfig.ip}, PORT: ${newConfig.port}, USER: ${newConfig.user}, PASSWORD: ${newConfig.password})`);
-        console.log(`RE-Connected (IP: ${newConfig.ip}, PORT: ${newConfig.port}, USER: ${newConfig.user}, PASSWORD: ${newConfig.password})`);
+        logs.push(` - RE-Connected (IP: ${newConfig.ip ?? ip}, PORT: ${newConfig.port ?? port}, USER: ${newConfig.user ?? user}, PASSWORD: ${newConfig.password ?? password})`);
+        console.log(`RE-Connected (IP: ${newConfig.ip ?? ip}, PORT: ${newConfig.port ?? port}, USER: ${newConfig.user ?? user}, PASSWORD: ${newConfig.password ?? password})`);
+      }, {
+        host: ip,
+        port: port,
+        username: user,
+        password: password,
       });
       client.dispose();
       console.log(`Disconnected from ${name}`);

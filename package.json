@@ -1,6 +1,6 @@
 {
   "name": "@bettercorp/ssh-commander",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -19,7 +19,8 @@
   ],
   "files": [
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "author": "Mitchell R <github@mrincworld.com>",
   "license": "AGPL-3.0",

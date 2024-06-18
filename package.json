@@ -1,0 +1,31 @@
+{
+  "name": "ssh-commander",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BetterCorp/ssh-commander.git"
+  },
+  "bin": {
+    "ssh-commander": "src/index.js"
+  },
+  "scripts": {},
+  "keywords": [
+    "ssh",
+    "mikrotik",
+    "routeros",
+    "mikrotik-routeros",
+    "ssh-commander"
+  ],
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "author": "Mitchell R <github@mrincworld.com>",
+  "license": "AGPL-3.0",
+  "description": "Does SSH stuff - see readme",
+  "dependencies": {
+    "node-ssh": "^13.2.0",
+    "ping": "^0.4.4"
+  }
+}

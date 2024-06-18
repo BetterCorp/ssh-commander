@@ -32,13 +32,12 @@ const commanders = {
 
   const ssh = new NodeSSH();
 
-  const devices = fs.readFileSync(path.join(process.cwd(), '../devices.txt'), 'utf8').toString().split('\n');
+  const devices = fs.readFileSync(path.join(process.cwd(), './devices.txt'), 'utf8').toString().split('\n')
+      .filter(x => x.trim().indexOf(',') > 0)
+      .filter(x => x.trim().indexOf('#') !== 0);
   let logs = [];
 
   for (const device of devices) {
-    if (device.startsWith('#')) continue;
-    if (device.length < 5) continue;
-
     const [name, ip, port, user, password, ignoreping] = device.split(',');
     console.log(`Connecting to ${name}`);
     logs.push(`Connecting to ${name}`);

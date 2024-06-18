@@ -1,6 +1,7 @@
 {
   "name": "@bettercorp/ssh-commander",
-  "version": "1.1.0",
+  "version": "1.2.0",
+  "type": "module",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -26,7 +27,10 @@
   "license": "AGPL-3.0",
   "description": "Does SSH stuff - see readme",
   "dependencies": {
+    "inquirer": "^9.2.23",
     "node-ssh": "^13.2.0",
-    "ping": "^0.4.4"
+    "ping": "^0.4.4",
+    "yaml": "^2.4.5",
+    "zod": "^3.23.8"
   }
 }

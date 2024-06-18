@@ -1,10 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const bulkExport = require('./bulkExport');
+import fs from 'fs';
+import path from 'path';
+import {commander as bulkExport} from './bulkExport.js';
+import zod from 'zod';
 
-module.exports.commander = async (command, log, reconnect, config) => {
+export const name = 'Mikrotik Bulk User Update';
+export const description = 'Log into multiple mikrotik routers and create a new random user with a random password and remove all existing users.';
+
+export const config = zod.object({
+  forceReboot: zod.boolean().optional(),
+  forceUpdate: zod.boolean().optional(),
+}).default({
+  forceReboot: false,
+  forceUpdate: false,
+});
+export const commander = async (command, log, reconnect, config) => {
   log('/user print');
-  result = ((await command(fs.readFileSync(path.join(__dirname, './getUsers.rsc')).toString().split('\n').join(' '))))[0];
+  let result = ((await command(fs.readFileSync(path.join(__dirname, './getUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const users = JSON.parse(result);
   console.log(users);
@@ -12,15 +23,15 @@ module.exports.commander = async (command, log, reconnect, config) => {
     log(`(${user.id}) ${user.name}: ${user.group} (LLI: ${user.lastLoggedIn})`, 1);
   }
 
-  if (users.find(x => x.name === config.username).group !== 'full') {
-    log(`WARN - User ${config.username} is not a full user, unable to perform actions... will try export!`);
+  if (users.find(x => x.name === config.user).group !== 'full') {
+    log(`WARN - User ${config.user} is not a full user, unable to perform actions... will try export!`);
   }
 
-  const info = await bulkExport.commander(command, log, reconnect, config);
+  const info = await bulkExport(command, log, reconnect, config);
   const majorVersion = parseInt(info.rb.currentFirmware.split('.')[0].trim());
 
-  if (users.find(x => x.name === config.username).group !== 'full') {
-    log(`User ${config.username} is not a full user, unable to perform actions!`);
+  if (users.find(x => x.name === config.user).group !== 'full') {
+    log(`User ${config.user} is not a full user, unable to perform actions!`);
     throw new Error('User is not a full user');
   }
 

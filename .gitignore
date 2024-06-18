@@ -2,3 +2,5 @@
 /devices.txt
 /exports
 /node_modules
+/devices.yaml
+/log*

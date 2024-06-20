@@ -23,6 +23,7 @@ const WORKING_DIR = path.join(path.resolve(path.dirname(process.argv[1])), '../'
   const commanders = {
     mikrotikBulkUserUpdate: (await import('./mikrotik/bulkUserUpdate.js')),
     mikrotikBulkExport: (await import('./mikrotik/bulkExport.js')),
+    mikrotikBulkReboot: (await import('./mikrotik/bulkReboot.js')),
   };
 
   if (fs.existsSync(path.join(process.cwd(), './log.txt'))) {
@@ -50,6 +51,7 @@ const WORKING_DIR = path.join(path.resolve(path.dirname(process.argv[1])), '../'
     fs.writeFileSync(path.join(process.cwd(), './devices.yaml'), YAML.stringify(SCHEMA.parse(undefined)));
     process.exit(0);
   }
+
   let commander = undefined;
   if (process.argv.length >= 3) {
     const cmd = process.argv[2].trim().toLowerCase();
@@ -77,10 +79,62 @@ const WORKING_DIR = path.join(path.resolve(path.dirname(process.argv[1])), '../'
 
   const ssh = new NodeSSH();
 
-  const devices = SCHEMA.parse(YAML.parse(fs.readFileSync(path.join(process.cwd(), './devices.yaml'), 'utf8')));
+  let devices = SCHEMA.parse(YAML.parse(fs.readFileSync(path.join(process.cwd(), './devices.yaml'), 'utf8')));
   let logs = [];
+  const updateConfig = (oldDevice, keysToSet) => {
+    console.log('update', JSON.stringify(oldDevice), JSON.stringify(keysToSet));
+    for (let dI = 0; dI < devices.length; dI++) {
+      if (devices[dI].ip === oldDevice.ip && devices[dI].port === oldDevice.port && devices[dI].user === oldDevice.user && devices[dI].password === oldDevice.password) {
+        for (const keyToSet of keysToSet) {
+          devices[dI][keyToSet.key] = keyToSet.value;
+        }
+        fs.writeFileSync(path.join(process.cwd(), './devices.yaml'), YAML.stringify(SCHEMA.parse(devices)));
+        return devices[dI];
+      }
+    }
+    throw new Error('Device not found TO UPDATE!!!!');
+  }
 
-  for (const device of devices) {
+  for (let deviceRef of devices) {
+    let device = {
+      updateDevice: (keysToSet) => {
+        deviceRef = updateConfig(deviceRef, keysToSet);
+      },
+      get name() {
+        return deviceRef.name;
+      },
+      set name(value) {
+        deviceRef = updateConfig(deviceRef, [{key: 'name', value}]);
+      },
+      get ip() {
+        return deviceRef.ip;
+      },
+      set ip(value) {
+        deviceRef = updateConfig(deviceRef, [{key: 'ip', value}]);
+      },
+      get port() {
+        return deviceRef.port;
+      },
+      set port(value) {
+        deviceRef = updateConfig(deviceRef, [{key: 'port', value}]);
+      },
+      get user() {
+        return deviceRef.user;
+      },
+      set user(value) {
+        deviceRef = updateConfig(deviceRef, [{key: 'user', value}]);
+      },
+      get password() {
+        return deviceRef.password;
+      },
+      set password(value) {
+        deviceRef = updateConfig(deviceRef, [{key: 'password', value}]);
+      },
+    }
+    for (const key of Object.keys(deviceRef)) {
+      if (['name', 'ip', 'port', 'user', 'password'].includes(key)) continue;
+      device[key] = deviceRef[key];
+    }
     console.log(`Connecting to ${device.name}`);
     logs.push(`Connecting to ${device.name}`);
     try {
@@ -108,7 +162,7 @@ const WORKING_DIR = path.join(path.resolve(path.dirname(process.argv[1])), '../'
         if (level === 1) txt += ' > ';
         if (level > 1) txt += '   '.repeat(level);
         logs.push(txt + log);
-      }, async (newConfig) => {
+      }, async (newConfig = {}) => {
         await client.dispose();
         console.log(`FORCE Disconnected from ${device.name}`);
         logs.push(`*** FORCE Disconnected from ${device.name} (for reconnect)`);

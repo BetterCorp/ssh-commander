@@ -13,7 +13,7 @@ export const config = zod.object({
   forceReboot: false,
   forceUpdate: false,
 });
-export const commander = async (WORKING_DIR, command, log, reconnect, config) => {
+export const commander = async (WORKING_DIR, command, log, reconnect, device) => {
   log('/user print');
   let result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './src/mikrotik/getUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
@@ -23,15 +23,15 @@ export const commander = async (WORKING_DIR, command, log, reconnect, config) =>
     log(`(${user.id}) ${user.name}: ${user.group} (LLI: ${user.lastLoggedIn})`, 1);
   }
 
-  if (users.find(x => x.name === config.user).group !== 'full') {
-    log(`WARN - User ${config.user} is not a full user, unable to perform actions... will try export!`);
+  if (users.find(x => x.name === device.user).group !== 'full') {
+    log(`WARN - User ${device.user} is not a full user, unable to perform actions... will try export!`);
   }
 
-  const info = await bulkExport(WORKING_DIR, command, log, reconnect, config);
+  const info = await bulkExport(WORKING_DIR, command, log, reconnect, device);
   const majorVersion = parseInt(info.rb.currentFirmware.split('.')[0].trim());
 
-  if (users.find(x => x.name === config.user).group !== 'full') {
-    log(`User ${config.user} is not a full user, unable to perform actions!`);
+  if (users.find(x => x.name === device.user).group !== 'full') {
+    log(`User ${device.user} is not a full user, unable to perform actions!`);
     throw new Error('User is not a full user');
   }
 
@@ -39,11 +39,14 @@ export const commander = async (WORKING_DIR, command, log, reconnect, config) =>
   const newPassword = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2)
   log(`Creating new user (${newUser}) (${newPassword})`, 1);
   await command(`/user add name=${newUser} group=full password=${newPassword}`);
+  console.log(`Created new user (${newUser}) (${newPassword})`, 1);
   log(`Created new user (${newUser}) (${newPassword})`, 1);
-  await reconnect({
-    user: newUser,
-    password: newPassword,
-  });
+
+  log('Pushing back config change of username and password');
+  device.updateDevice([{key: 'user', value: newUser}, {key: 'password', value: newPassword}]);
+
+  log(`Reconnect with new user (${newUser}) (${newPassword})`, 1);
+  await reconnect();
 
   log('/user active print');
   result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './src/mikrotik/getActiveUsers.rsc')).toString().split('\n').join(' '))))[0];

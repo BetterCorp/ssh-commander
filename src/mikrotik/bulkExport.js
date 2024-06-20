@@ -3,9 +3,9 @@ import path from 'path';
 
 export const name = 'Mikrotik Bulk Export';
 export const description = 'Logs into multiple mikrotik routers and exports the config to a file.';
-export const commander = async (command, log, reconnect) => {
+export const commander = async (WORKING_DIR, command, log, reconnect) => {
   log('/system routerboard print')
-  let result = ((await command(fs.readFileSync(path.join(__dirname, './getRouterboardInfo.rsc')).toString().split('\n').join(' '))))[0];
+  let result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './getRouterboardInfo.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const info = JSON.parse(result);
   for (const key of Object.keys(info.rb)) {

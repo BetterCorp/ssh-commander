@@ -13,9 +13,9 @@ export const config = zod.object({
   forceReboot: false,
   forceUpdate: false,
 });
-export const commander = async (command, log, reconnect, config) => {
+export const commander = async (WORKING_DIR, command, log, reconnect, config) => {
   log('/user print');
-  let result = ((await command(fs.readFileSync(path.join(__dirname, './getUsers.rsc')).toString().split('\n').join(' '))))[0];
+  let result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './getUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const users = JSON.parse(result);
   console.log(users);
@@ -27,7 +27,7 @@ export const commander = async (command, log, reconnect, config) => {
     log(`WARN - User ${config.user} is not a full user, unable to perform actions... will try export!`);
   }
 
-  const info = await bulkExport(command, log, reconnect, config);
+  const info = await bulkExport(WORKING_DIR, command, log, reconnect, config);
   const majorVersion = parseInt(info.rb.currentFirmware.split('.')[0].trim());
 
   if (users.find(x => x.name === config.user).group !== 'full') {
@@ -46,7 +46,7 @@ export const commander = async (command, log, reconnect, config) => {
   });
 
   log('/user active print');
-  result = ((await command(fs.readFileSync(path.join(__dirname, './getActiveUsers.rsc')).toString().split('\n').join(' '))))[0];
+  result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './getActiveUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const activeUsers = JSON.parse(result);
   console.log(activeUsers);

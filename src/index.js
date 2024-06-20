@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fs from 'fs';
 import path from 'path';
 import {NodeSSH} from 'node-ssh';
@@ -15,7 +17,9 @@ let configSchema = {
   ignorePing: zod.boolean().optional().default(false),
 };
 
+const WORKING_DIR = __dirname ?? path.join(path.resolve(path.dirname(process.argv[1])), '../');
 (async () => {
+  console.log('SRC Dir: ' + WORKING_DIR);
   const commanders = {
     mikrotikBulkUserUpdate: (await import('./mikrotik/bulkUserUpdate.js')),
     mikrotikBulkExport: (await import('./mikrotik/bulkExport.js')),
@@ -92,7 +96,7 @@ let configSchema = {
       });
       logs.push(` - connected`);
       console.log(`Connected to ${device.name}`);
-      await commander(async (command) => {
+      await commander(WORKING_DIR, async (command) => {
         const response = await client.execCommand(command);
         if (response.stderr.length > 0) {
           logs.push(` - ${response.stderr}`);

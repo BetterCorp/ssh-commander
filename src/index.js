@@ -17,7 +17,7 @@ let configSchema = {
   ignorePing: zod.boolean().optional().default(false),
 };
 
-const WORKING_DIR = __dirname ?? path.join(path.resolve(path.dirname(process.argv[1])), '../');
+const WORKING_DIR = path.join(path.resolve(path.dirname(process.argv[1])), '../');
 (async () => {
   console.log('SRC Dir: ' + WORKING_DIR);
   const commanders = {

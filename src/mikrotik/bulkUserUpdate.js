@@ -15,7 +15,7 @@ export const config = zod.object({
 });
 export const commander = async (WORKING_DIR, command, log, reconnect, config) => {
   log('/user print');
-  let result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './getUsers.rsc')).toString().split('\n').join(' '))))[0];
+  let result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './src/mikrotik/getUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const users = JSON.parse(result);
   console.log(users);
@@ -46,7 +46,7 @@ export const commander = async (WORKING_DIR, command, log, reconnect, config) =>
   });
 
   log('/user active print');
-  result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './getActiveUsers.rsc')).toString().split('\n').join(' '))))[0];
+  result = ((await command(fs.readFileSync(path.join(WORKING_DIR, './src/mikrotik/getActiveUsers.rsc')).toString().split('\n').join(' '))))[0];
   console.log(result);
   const activeUsers = JSON.parse(result);
   console.log(activeUsers);
